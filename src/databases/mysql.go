@@ -9,7 +9,7 @@ import (
 var SQL *sql.DB
 
 func SQLConnect() (*sql.DB, error) {
-	SQL, err := sql.Open("mysql", "admin:M@R!4dB@tcp(localhost:3306)/go")
+	SQL, err := sql.Open("mysql", "<db_username>:<db_password>@tcp(localhost:3306)/<table_name>")
 	if err != nil {
 		log.Fatal(err)
 	}
