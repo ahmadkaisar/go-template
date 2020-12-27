@@ -12,7 +12,7 @@ import (
 
 type JWT struct {}
 
-var mysigningkey = []byte("masamunekenji")
+var mysigningkey = []byte("SomethingInteresting123456")
 
 func (j JWT) Generate(user_id, role_id int, user_name, role_name string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)

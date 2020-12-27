@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -52,24 +53,31 @@ func (file File) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	 // Check filepath
+	 path := filepath.Dir("file/" + filename)
+	 if path != "file" {
+		handler.Response(w, r, 500, "illegal path to file")
+		log.Println("illegal path to file")
+		return
+	 }
 	 // Open file
-    f, err := os.Open("file/" + filename)
-    if err != nil {
-    	handler.Response(w, r, 500, "failed to open file")
-        log.Println(err)
-        return
-    }
-    defer f.Close()
+    	f, err := os.Open("file/" + filename)
+    	if err != nil {
+    		handler.Response(w, r, 500, "failed to open file")
+        	log.Println(err)
+        	return
+    	}
+    	defer f.Close()
 
-    //Set header
-    // w.Header().Set("Content-type", "application/pdf")
+    	// Set header
+    	// w.Header().Set("Content-type", "application/pdf")
 
-    //Stream to response
-    if _, err := io.Copy(w, f); err != nil {
-    	handler.Response(w, r, 500, "failed to stream")
-        log.Println(err)
-        return
-    }
+    	// Stream to response
+    	if _, err := io.Copy(w, f); err != nil {
+    		handler.Response(w, r, 500, "failed to stream")
+        	log.Println(err)
+        	return
+    	}
 }
 
 func (file File) Post(w http.ResponseWriter, r *http.Request) {
