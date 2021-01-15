@@ -42,16 +42,8 @@ func (user User) Response(w http.ResponseWriter, r *http.Request, Info string, C
 }
 
 func (user User) Get(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
 	var count int
-	var jwt middleware.JWT
 	var users []User
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
 
 	query := db.Gorm.Table("user").Select("user.id, user.name, user.email, role.id, role.name").Joins("JOIN role ON user.role_id = role.id")
 	
@@ -79,13 +71,6 @@ func (user User) Get(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, err = jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	}
-
 	count_query.Count(&count)
 	rows, err := query.Rows()
 	if err != nil {
@@ -109,25 +94,7 @@ func (user User) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (user User) Post(w http.ResponseWriter, r *http.Request) {
-	// var auth Auth
-	// var jwt middleware.JWT
-
-	// token, err := auth.Get(r)
-	// if err != nil {
-	// 	handler.Response(w, r, 401, "not authorized")
-	// 	return
-	// }
-
-	// claims, err := jwt.Claim(token)
-	// if err != nil {
-	// 	handler.Response(w, r, 500, "error on claim")
-	// 	log.Println(err)
-	// 	return
-	// } else if (int(claims["role_id"].(float64)) != 0) {
-	// 	handler.Response(w, r, 403, "forbidden")
-	// 	return
-	// }
-
+	
 	stmt, err := db.SQL.Prepare("INSERT INTO user(name, email, password, role_id) VALUES(?, ?, ?, ?)")
 	if err != nil {
 		handler.Response(w, r, 500, "query error")
@@ -176,9 +143,7 @@ func (user User) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (user User) GetId(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
 	var count int
-	var jwt middleware.JWT
 	var rows *sql.Rows
 	var users []User
 
@@ -190,28 +155,11 @@ func (user User) GetId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := auth.Get(r)
+	rows, err = db.Gorm.Table("user").Select("user.id, user.name, user.email, role.id, role.name").Joins("JOIN role ON user.role_id = role.id").Where("user.id = ?", id).Rows()
 	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
+		handler.Response(w, r, 500, "query error")
 		log.Println(err)
 		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		log.Println(err)
-		return
-	} else {
-		rows, err = db.Gorm.Table("user").Select("user.id, user.name, user.email, role.id, role.name").Joins("JOIN role ON user.role_id = role.id").Where("user.id = ?", id).Rows()
-		if err != nil {
-			handler.Response(w, r, 500, "query error")
-			log.Println(err)
-			return
-		}
 	}
 
 	defer rows.Close()
@@ -245,9 +193,6 @@ func (user User) Put(w http.ResponseWriter, r *http.Request) {
 		handler.Response(w, r, 500, "error on claim")
 		log.Println(err)
 		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
 	}
 
 	params := mux.Vars(r)
@@ -255,6 +200,10 @@ func (user User) Put(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handler.Response(w, r, 500, "id not valid")
 		log.Println(err)
+		return
+	} else if int(claims["role_id"].(float64)) != 0 && int(claims["user_id"].(float64)) != id {
+		handler.Response(w, r, 403, "not authorized")
+		log.Println("someone beside admin try to delete other account")
 		return
 	}
 
@@ -305,25 +254,7 @@ func (user User) Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func (user User) Delete(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
-
+	
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {

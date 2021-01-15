@@ -50,7 +50,9 @@ CREATE TABLE `role` (
 --
 
 INSERT INTO `role` (`id`, `name`) VALUES
-(0, 'System Administrator');
+(0, 'System Administrator'),
+(1, 'Administrator'),
+(2, 'Engineer')
 
 -- --------------------------------------------------------
 

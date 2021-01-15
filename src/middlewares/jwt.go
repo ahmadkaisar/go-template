@@ -4,6 +4,7 @@ import (
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -12,7 +13,20 @@ import (
 
 type JWT struct {}
 
-var mysigningkey = []byte("SomethingInteresting123456")
+var mysigningkey = []byte(os.Getenv("JWT_SIGN_KEY"))
+
+func (j JWT) Check(role int, roles []int) bool {
+	found := false
+	if role == 0 {
+		return true
+	}
+	for i := 0; i < len(roles) && !found; i++ {
+		if roles[i] == role {
+			found = true
+		}
+	}
+	return found
+}
 
 func (j JWT) Generate(user_id, role_id int, user_name, role_name string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -51,7 +65,7 @@ func (j JWT) Claim(t string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func (j JWT) Validate(endpoint http.HandlerFunc) http.Handler {
+func (j JWT) Validate(endpoint http.HandlerFunc, roles []int) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 		if r.Method == "OPTIONS" {
 			handler.Response(w, r, 200, "allowed")
@@ -74,6 +88,14 @@ func (j JWT) Validate(endpoint http.HandlerFunc) http.Handler {
 				handler.Response(w, r, 500, "there was an error when parsing token")
 				return
 			} else if token.Valid {
+				claims, err := j.Claim(bearer[1])
+				if err != nil {
+					handler.Response(w, r, 500, "failed to claim token")
+					return
+				} else if !j.Check(int(claims["role_id"].(float64)), roles) {
+					handler.Response(w, r, 403, "forbidden")
+					return
+				}
 				endpoint(w, r)
 				return
 			} else {
@@ -103,6 +125,14 @@ func (j JWT) Validate(endpoint http.HandlerFunc) http.Handler {
 				handler.Response(w, r, 500, "there was an error when parsing token")
 				return
 			} else if token.Valid {
+				claims, err := j.Claim(bearer[1])
+				if err != nil {
+					handler.Response(w, r, 500, "failed to claim token")
+					return
+				} else if !j.Check(int(claims["role_id"].(float64)), roles) {
+					handler.Response(w, r, 403, "forbidden")
+					return
+				}
 				endpoint(w, r)
 				return
 			} else {

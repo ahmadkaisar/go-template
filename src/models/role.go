@@ -11,7 +11,6 @@ import (
 
 	db "../databases"
 	handler "../handlers"
-	middleware "../middlewares"
 )
 
 type Role struct {
@@ -38,23 +37,8 @@ func (role Role) Response(w http.ResponseWriter, r *http.Request, Info string, C
 }
 
 func (role Role) Get(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
 	var count int
-	var jwt middleware.JWT
 	var roles []Role
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	_, err = jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	}
 
 	query := db.Gorm.Table("role").Select("role.id, role.name")
 	
@@ -105,24 +89,6 @@ func (role Role) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (role Role) Post(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
 
 	stmt, err := db.SQL.Prepare("INSERT INTO role(name) VALUES(?)")
 	if err != nil {
@@ -152,9 +118,7 @@ func (role Role) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (role Role) GetId(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
 	var count int
-	var jwt middleware.JWT
 	var rows *sql.Rows
 	var roles []Role
 
@@ -163,22 +127,6 @@ func (role Role) GetId(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handler.Response(w, r, 500, "id not valid")
 		log.Println(err)
-		return
-	}
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
 		return
 	}
 
@@ -206,24 +154,6 @@ func (role Role) GetId(w http.ResponseWriter, r *http.Request) {
 }
 
 func (role Role) Put(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
 
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
@@ -261,24 +191,6 @@ func (role Role) Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func (role Role) Delete(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
 
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])

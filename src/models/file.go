@@ -15,7 +15,6 @@ import (
 
 	db "../databases"
 	handler "../handlers"
-	middleware "../middlewares"
 )
 
 type File struct {
@@ -81,24 +80,6 @@ func (file File) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (file File) Post(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
 
 	// maximum 200 Mb file upload
 	r.ParseMultipartForm(200 << 20)
@@ -140,24 +121,6 @@ func (file File) Post(w http.ResponseWriter, r *http.Request) {
 }
 
 func (file File) Put(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
 
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
@@ -207,24 +170,6 @@ func (file File) Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func (file File) Delete(w http.ResponseWriter, r *http.Request) {
-	var auth Auth
-	var jwt middleware.JWT
-
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	} else if (int(claims["role_id"].(float64)) != 0) {
-		handler.Response(w, r, 403, "forbidden")
-		return
-	}
 
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])

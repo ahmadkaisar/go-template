@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 
@@ -21,6 +22,7 @@ func main() {
 	defer db.Gorm.Close()
 
 	// start http listener
+	port := os.Getenv("PORT")
 	router := mux.NewRouter()
 
 	// middleware handler
@@ -40,28 +42,28 @@ func main() {
 
 	// user handler
 	var user model.User
-	router.Handle("/users", jwt.Validate(user.Get)).Methods("GET", "OPTIONS")
-	router.Handle("/users", jwt.Validate(user.Post)).Methods("POST", "OPTIONS")
-	router.Handle("/users/{id}", jwt.Validate(user.GetId)).Methods("GET", "OPTIONS")
-	router.Handle("/users/{id}", jwt.Validate(user.Put)).Methods("PUT", "OPTIONS")
-	router.Handle("/users/{id}", jwt.Validate(user.Delete)).Methods("DELETE", "OPTIONS")
+	router.Handle("/users", jwt.Validate(user.Get, []int{1, 2})).Methods("GET", "OPTIONS")
+	router.Handle("/users", jwt.Validate(user.Post, []int{1})).Methods("POST", "OPTIONS")
+	router.Handle("/users/{id}", jwt.Validate(user.GetId, []int{1})).Methods("GET", "OPTIONS")
+	router.Handle("/users/{id}", jwt.Validate(user.Put, []int{1})).Methods("PUT", "OPTIONS")
+	router.Handle("/users/{id}", jwt.Validate(user.Delete, []int{1})).Methods("DELETE", "OPTIONS")
 
 	// role handler
 	var role model.Role
-	router.Handle("/roles", jwt.Validate(role.Get)).Methods("GET", "OPTIONS")
-	router.Handle("/roles", jwt.Validate(role.Post)).Methods("POST", "OPTIONS")
-	router.Handle("/roles/{id}", jwt.Validate(role.GetId)).Methods("GET", "OPTIONS")
-	router.Handle("/roles/{id}", jwt.Validate(role.Put)).Methods("PUT", "OPTIONS")
-	router.Handle("/roles/{id}", jwt.Validate(role.Delete)).Methods("DELETE", "OPTIONS")
+	router.Handle("/roles", jwt.Validate(role.Get, []int{1})).Methods("GET", "OPTIONS")
+	router.Handle("/roles", jwt.Validate(role.Post, []int{})).Methods("POST", "OPTIONS")
+	router.Handle("/roles/{id}", jwt.Validate(role.GetId, []int{1})).Methods("GET", "OPTIONS")
+	router.Handle("/roles/{id}", jwt.Validate(role.Put, []int{})).Methods("PUT", "OPTIONS")
+	router.Handle("/roles/{id}", jwt.Validate(role.Delete, []int{})).Methods("DELETE", "OPTIONS")
 
 	// file handler
 	var file model.File
-	router.Handle("/files/file", jwt.Validate(file.Post)).Methods("POST", "OPTIONS")
-	router.Handle("/files/file/{id}", jwt.Validate(file.Put)).Methods("PUT", "OPTIONS")
-	router.Handle("/files/file/{id}", jwt.Validate(file.Delete)).Methods("DELETE", "OPTIONS")
-	router.Handle("/files/file/{name}", jwt.Validate(file.Get)).Methods("GET", "OPTIONS")
+	router.Handle("/files/file", jwt.Validate(file.Post, []int{1})).Methods("POST", "OPTIONS")
+	router.Handle("/files/file/{id}", jwt.Validate(file.Put, []int{1})).Methods("PUT", "OPTIONS")
+	router.Handle("/files/file/{id}", jwt.Validate(file.Delete, []int{1})).Methods("DELETE", "OPTIONS")
+	router.Handle("/files/file/{name}", jwt.Validate(file.Get, []int{1})).Methods("GET", "OPTIONS")
 	
 	http.Handle("/", router)
-	fmt.Println("Connected to port 5001")
-	log.Fatal(http.ListenAndServe(":5001", router))
+	fmt.Println("Connected to port " + port)
+	log.Fatal(http.ListenAndServe(":" + port, router))
 }
