@@ -182,18 +182,8 @@ func (user User) Put(w http.ResponseWriter, r *http.Request) {
 	var auth Auth
 	var jwt middleware.JWT
 
-	token, err := auth.Get(r)
-	if err != nil {
-		handler.Response(w, r, 401, "not authorized")
-		return
-	}
-
-	claims, err := jwt.Claim(token)
-	if err != nil {
-		handler.Response(w, r, 500, "error on claim")
-		log.Println(err)
-		return
-	}
+	token, _ := auth.Get(r)
+	claims, _ := jwt.Claim(token)
 
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
@@ -203,7 +193,7 @@ func (user User) Put(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if int(claims["role_id"].(float64)) != 0 && int(claims["user_id"].(float64)) != id {
 		handler.Response(w, r, 403, "not authorized")
-		log.Println("someone beside admin try to delete other account")
+		log.Println("someone beside admin try to edit other account")
 		return
 	}
 
