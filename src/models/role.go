@@ -14,8 +14,8 @@ import (
 )
 
 type Role struct {
-	Id int `form:"id" json:"id"`
-	Name string `form:"name" json:"name"`
+	Id int `json:"id"`
+	Name string `json:"name"`
 }
 
 type RoleResp struct {

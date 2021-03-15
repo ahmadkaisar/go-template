@@ -17,10 +17,10 @@ import (
 )
 
 type User struct {
-	Id int `form:"id" json:"id"`
-	Name string `form:"name" json:"name"`
-	Email string `form:"email" json:"email"`
-	Role Role `form:"role" json:"role"`
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Email string `json:"email"`
+	Role Role `json:"role"`
 }
 
 type UserResp struct {

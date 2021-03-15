@@ -18,9 +18,9 @@ import (
 )
 
 type File struct {
-	Id int `form:"id" json:"id"`
-	Name string `form:"name" json:"name"`
-	Timestamp string `form:"timestamp" json:"timestamp"`
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Timestamp string `json:"timestamp"`
 }
 
 type FileResp struct {
