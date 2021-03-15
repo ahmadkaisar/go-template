@@ -28,6 +28,11 @@ func main() {
 	// middleware handler
 	var jwt middleware.JWT
 
+	// basic response handler
+	router.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+		handler.Response(w, r, 200, "success")
+	}).Methods("GET", "OPTIONS")
+
 	// auth
 	var auth model.Auth
 	router.HandleFunc("/auth", auth.Authentication).Methods("POST", "OPTIONS")
