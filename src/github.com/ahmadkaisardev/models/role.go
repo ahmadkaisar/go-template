@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strconv"
 
-	db "../databases"
-	handler "../handlers"
+	db "github.com/ahmadkaisardev/databases"
+	handler "github.com/ahmadkaisardev/handlers"
 )
 
 type Role struct {

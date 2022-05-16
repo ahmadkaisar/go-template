@@ -1,0 +1,12 @@
+FROM golang:latest
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install curl gdb vim make -y
+RUN mkdir -p /src
+COPY ./src/ /src
+WORKDIR /src/github.com/ahmadkaisardev
+RUN go mod init github.com/ahmadkaisardev
+RUN go mod tidy
+RUN go install
+WORKDIR /
+RUN mkdir -p /go/bin/files
+RUN ln -s /go/bin/ahmadkaisardev /etc/init.d/ahmadkaisardev

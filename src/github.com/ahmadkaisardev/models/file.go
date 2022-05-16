@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	db "../databases"
-	handler "../handlers"
+	db "github.com/ahmadkaisardev/databases"
+	handler "github.com/ahmadkaisardev/handlers"
 )
 
 type File struct {
@@ -53,14 +53,14 @@ func (file File) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	 // Check filepath
-	 path := filepath.Dir("file/" + filename)
+	 path := filepath.Dir("files/" + filename)
 	 if path != "file" {
 		handler.Response(w, r, 500, "illegal path to file")
 		log.Println("illegal path to file")
 		return
 	 }
 	 // Open file
-    	f, err := os.Open("file/" + filename)
+    	f, err := os.Open("files/" + filename)
     	if err != nil {
     		handler.Response(w, r, 500, "failed to open file")
         	log.Println(err)

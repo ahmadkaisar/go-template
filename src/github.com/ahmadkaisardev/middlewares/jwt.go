@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	handler "../handlers"
+	handler "github.com/ahmadkaisardev/handlers"
 )
 
 type JWT struct {}

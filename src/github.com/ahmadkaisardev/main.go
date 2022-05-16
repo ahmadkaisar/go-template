@@ -8,10 +8,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 
-	db "./databases"
-	handler "./handlers"
-	middleware "./middlewares"
-	model "./models"
+	db "github.com/ahmadkaisardev/databases"
+	handler "github.com/ahmadkaisardev/handlers"
+	middleware "github.com/ahmadkaisardev/middlewares"
+	model "github.com/ahmadkaisardev/models"
 )
 
 func main() {

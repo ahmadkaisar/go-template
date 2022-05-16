@@ -11,9 +11,9 @@ import (
 	"regexp"
 	"strings"
 
-	db "../databases"
-	handler "../handlers"
-	middleware "../middlewares"
+	db "github.com/ahmadkaisardev/databases"
+	handler "github.com/ahmadkaisardev/handlers"
+	middleware "github.com/ahmadkaisardev/middlewares"
 )
 
 type Auth struct {}
