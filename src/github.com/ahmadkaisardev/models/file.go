@@ -54,7 +54,7 @@ func (file File) Get(w http.ResponseWriter, r *http.Request) {
 
 	 // Check filepath
 	 path := filepath.Dir("files/" + filename)
-	 if path != "file" {
+	 if path != "files" {
 		handler.Response(w, r, 500, "illegal path to file")
 		log.Println("illegal path to file")
 		return
